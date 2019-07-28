@@ -1,0 +1,22 @@
+library(shiny)
+library(miniUI)
+
+pickTrees <- function(){
+  ui <- miniPage(
+    gadgetTitleBar("Select Points by Dragging Your Mouse"),
+    miniContentPanel(
+      plotOutput("plot", height = "100%", brush = "brush") # brush is the mouse selection by the user take caution here to name the output correctly!
+    )
+  )
+  
+  ## remember we defined "plot" and "brush" in the ui - so we need to refer to those
+  server <- function(input, output, session){
+    output$plot <- renderPlot({
+      plot(trees$Girth, trees$Volume, main ="Trees", xlab  ="Girth", ylab = "Volume")
+    })
+    observeEvent(input$done, {
+      stopApp(brushedPoints(trees, input$brush, xvar  ="Girth",yvar = "Volume")) # syntax is here that you define the trees and then give the input$brush which is defined in the UI (!!) we stop the app when we collected the point
+    })
+  }
+  runGadget(ui,server)
+}
